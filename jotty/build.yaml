@@ -1,0 +1,15 @@
+# Home Assistant Add-on build configuration
+# Tells the HA builder which base image to use per architecture.
+# The official Jotty image on GHCR supports both amd64 and arm64 natively.
+
+build_from:
+  amd64: ghcr.io/hassio-addons/base/amd64:latest
+  aarch64: ghcr.io/hassio-addons/base/aarch64:latest
+
+# Labels applied to the built image
+labels:
+  org.opencontainers.image.title: "Jotty"
+  org.opencontainers.image.description: >
+    Lightweight self-hosted app for managing personal checklists and notes.
+  org.opencontainers.image.source: "https://github.com/fccview/jotty"
+  org.opencontainers.image.licenses: "AGPL-3.0"

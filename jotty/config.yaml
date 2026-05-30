@@ -1,0 +1,60 @@
+name: "Jotty"
+description: "Lightweight self-hosted app for managing your personal checklists and notes. File-based storage, no database required."
+version: "1.0.0"
+slug: "jotty"
+homeassistant_api: false
+auth_api: false
+url: "https://github.com/fccview/jotty"
+
+# Use the official Jotty image
+image: "ghcr.io/fccview/jotty:{arch}"
+
+# Supported architectures
+arch:
+  - amd64
+  - aarch64
+
+# Startup order
+startup: application
+boot: auto
+
+# Port mapping: HA ingress + optional direct access
+ports:
+  1122/tcp: 1122
+ports_description:
+  1122/tcp: "Jotty Web UI"
+
+# Ingress for native HA panel integration
+ingress: true
+ingress_port: 3000
+ingress_stream: false
+panel_icon: "mdi:note-text-outline"
+panel_title: "Jotty"
+
+# NOTE: No map: block needed. HA automatically provides /data to each add-on
+# and includes it in standard HA backups.
+
+# User-configurable options
+options:
+  node_env: "production"
+  stop_check_updates: false
+  serve_public_images: true
+  serve_public_files: true
+  app_url: ""
+  sso_mode: ""
+  oidc_issuer: ""
+  oidc_client_id: ""
+  oidc_client_secret: ""
+  sso_fallback_local: true
+
+schema:
+  node_env: "str"
+  stop_check_updates: "bool"
+  serve_public_images: "bool"
+  serve_public_files: "bool"
+  app_url: "str?"
+  sso_mode: "str?"
+  oidc_issuer: "str?"
+  oidc_client_id: "str?"
+  oidc_client_secret: "str?"
+  sso_fallback_local: "bool"
