@@ -1,6 +1,6 @@
 name: "Jotty"
 description: "Lightweight self-hosted app for managing your personal checklists and notes. File-based storage, no database required."
-version: "1.0.0"
+version: "1.24.0"
 slug: "jotty"
 homeassistant_api: false
 auth_api: false
