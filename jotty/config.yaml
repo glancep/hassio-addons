@@ -6,9 +6,6 @@ homeassistant_api: false
 auth_api: false
 url: "https://github.com/fccview/jotty"
 
-# Use the official Jotty image
-image: "ghcr.io/fccview/jotty:{arch}"
-
 # Supported architectures
 arch:
   - amd64

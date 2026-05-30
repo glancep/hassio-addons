@@ -1,29 +1,22 @@
 # ============================================================
 # Jotty - Home Assistant Add-on
-# Wraps the official Jotty image with HA add-on scaffolding
+# Uses the official multi-arch Jotty image directly.
+# HA supervisor injects bashio and s6-overlay at build time
+# via the build_from base, but since Jotty's image already
+# has everything it needs, we just wrap it with our run.sh.
 # ============================================================
-ARG BUILD_FROM=ghcr.io/hassio-addons/base:latest
-FROM ${BUILD_FROM}
+FROM ghcr.io/fccview/jotty:latest
 
-# Use the official Jotty image as a source for its application files
-# We copy everything out of it so we can run inside the HA base image
-# (which provides bashio, s6-overlay, etc.)
-FROM ghcr.io/fccview/jotty:latest AS jotty_source
-
-# ── Final image ──────────────────────────────────────────────────────────────
-FROM ghcr.io/hassio-addons/base:latest
-
-# Install Node.js (same major version Jotty uses — 20.x)
-RUN apk add --no-cache nodejs npm
-
-# Copy the built Jotty application from the official image
-COPY --from=jotty_source /app /app
+# Install bashio for reading HA add-on options in run.sh
+RUN apk add --no-cache bash curl \
+ && curl -fsSL https://raw.githubusercontent.com/hassio-addons/bashio/master/lib/bashio.sh \
+      -o /usr/lib/bashio.sh \
+ && chmod +x /usr/lib/bashio.sh
 
 # Copy our HA entrypoint
-COPY run.sh /
-RUN chmod a+x /run.sh
+COPY run.sh /run.sh
+RUN chmod +x /run.sh
 
-# Jotty listens on port 3000
 EXPOSE 3000
 
 CMD ["/run.sh"]
