@@ -4,7 +4,7 @@ version: "1.24.0"
 slug: "jotty"
 homeassistant_api: false
 auth_api: false
-url: "https://github.com/fccview/jotty"
+url: "https://jotty.page/"
 
 # Supported architectures
 arch:
