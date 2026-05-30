@@ -9,7 +9,7 @@ url: "https://jotty.page/"
 # Pull the official multi-arch image directly — no custom Dockerfile needed.
 # The {arch} substitution is NOT used here; the official image is a multi-arch
 # manifest that selects the right variant automatically.
-image: "ghcr.io/fccview/jotty:latest"
+image: "ghcr.io/fccview/jotty"
 
 arch:
   - amd64
@@ -73,7 +73,7 @@ environment:
   SERVE_PUBLIC_IMAGES: serve_public_images
   SERVE_PUBLIC_FILES: serve_public_files
   APP_URL: app_url
-  SSO_MODE: sso_mode
+  AUTH_MODE: sso_mode
   OIDC_ISSUER: oidc_issuer
   OIDC_CLIENT_ID: oidc_client_id
   OIDC_CLIENT_SECRET: oidc_client_secret
