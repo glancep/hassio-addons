@@ -6,33 +6,39 @@ homeassistant_api: false
 auth_api: false
 url: "https://jotty.page/"
 
-# Supported architectures
+# Pull the official multi-arch image directly — no custom Dockerfile needed.
+# The {arch} substitution is NOT used here; the official image is a multi-arch
+# manifest that selects the right variant automatically.
+image: "ghcr.io/fccview/jotty:latest"
+
 arch:
   - amd64
   - aarch64
 
-# Startup order
 startup: application
 boot: auto
 
-# Port mapping: HA ingress + optional direct access
 ports:
   1122/tcp: 1122
 ports_description:
   1122/tcp: "Jotty Web UI"
 
-# Ingress for native HA panel integration
 ingress: true
 ingress_port: 3000
-ingress_stream: false
 panel_icon: "mdi:note-text-outline"
 panel_title: "Jotty"
 
-# NOTE: No map: block needed. HA automatically provides /data to each add-on
-# and includes it in standard HA backups.
+# /data is the add-on's private persistent directory included in HA backups.
+# We map it to the paths Jotty expects inside the container.
+map:
+  - type: data
+    path: /data
 
-# User-configurable options
+# Environment variables passed directly to the Jotty container.
+# All options map 1-to-1 with Jotty's documented env vars.
 options:
+  puid: 1000
+  pgid: 1000
   node_env: "production"
   stop_check_updates: false
   serve_public_images: true
@@ -45,6 +51,8 @@ options:
   sso_fallback_local: true
 
 schema:
+  puid: "int"
+  pgid: "int"
   node_env: "str"
   stop_check_updates: "bool"
   serve_public_images: "bool"
@@ -55,3 +63,18 @@ schema:
   oidc_client_id: "str?"
   oidc_client_secret: "str?"
   sso_fallback_local: "bool"
+
+# Map HA options directly to Jotty's environment variables.
+environment:
+  NODE_ENV: node_env
+  PUID: puid
+  PGID: pgid
+  STOP_CHECK_UPDATES: stop_check_updates
+  SERVE_PUBLIC_IMAGES: serve_public_images
+  SERVE_PUBLIC_FILES: serve_public_files
+  APP_URL: app_url
+  SSO_MODE: sso_mode
+  OIDC_ISSUER: oidc_issuer
+  OIDC_CLIENT_ID: oidc_client_id
+  OIDC_CLIENT_SECRET: oidc_client_secret
+  SSO_FALLBACK_LOCAL: sso_fallback_local

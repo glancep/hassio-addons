@@ -2,20 +2,22 @@
 
 **Jotty** ([jotty.page](https://jotty.page)) is a lightweight, self-hosted app for managing your personal checklists and notes. It uses file-based storage — no database required — and supports rich text notes, Kanban boards, PGP encryption, SSO via OIDC, and a full REST API.
 
+This add-on pulls the official `ghcr.io/fccview/jotty:latest` image directly and wires it into Home Assistant with persistent, backup-safe storage and sidebar ingress.
+
 ---
 
 ## Installation
 
 1. In Home Assistant, go to **Settings → Add-ons → Add-on Store**.
 2. Click the **⋮ menu** (top right) → **Repositories**.
-3. Add the URL of your custom repository (the folder containing this add-on).
+3. Add the URL of your custom repository.
 4. Find **Jotty** in the store and click **Install**.
 
 ---
 
 ## First Start
 
-1. Optionally configure the add-on options (see below) — defaults work fine for most users.
+1. Optionally review the configuration options below — defaults work fine for most users.
 2. Click **Start**.
 3. Click **Open Web UI** or use the **Jotty** sidebar panel.
 4. On your first visit you'll be redirected to `/auth/setup` to create your admin account.
@@ -24,7 +26,7 @@
 
 ## Data Storage
 
-All Jotty data is stored in the add-on's private `/data` directory:
+Jotty data is stored in the add-on's private `/data` directory, which Home Assistant maps to its own managed storage location:
 
 ```
 /data/
@@ -35,22 +37,26 @@ All Jotty data is stored in the add-on's private `/data` directory:
 │   ├── sharing/        ← shared-items.json
 │   └── encryption/     ← PGP keys per user
 ├── config/             ← Jotty config overrides
-└── cache/              ← Next.js build cache (optional)
+└── cache/              ← Next.js build cache
 ```
 
-> ✅ **`/data` is automatically included in standard Home Assistant backups.** No extra configuration needed — just use HA's built-in backup feature (Settings → System → Backups) and Jotty data is covered.
+> ✅ **`/data` is automatically included in standard Home Assistant backups.** Just use HA's built-in backup feature (Settings → System → Backups) and all Jotty data is covered — no extra configuration needed.
 
 ---
 
 ## Configuration Options
 
+Options are set in the add-on's **Configuration** tab and passed directly to Jotty as environment variables.
+
 | Option | Default | Description |
 |---|---|---|
+| `puid` | `1000` | User ID the container runs as. Match your host system user if needed. |
+| `pgid` | `1000` | Group ID the container runs as. |
 | `node_env` | `production` | Node.js environment mode. Leave as `production`. |
 | `stop_check_updates` | `false` | Set to `true` to disable Jotty's built-in update check. |
 | `serve_public_images` | `true` | Allow public image serving. |
 | `serve_public_files` | `true` | Allow public file serving. |
-| `app_url` | _(empty)_ | Your externally accessible URL (e.g. `https://jotty.yourdomain.com`). Required for SSO callback URLs and correct absolute links. |
+| `app_url` | _(empty)_ | Your externally accessible URL (e.g. `https://jotty.yourdomain.com`). Required for SSO callback URLs and correct absolute links when accessed outside HA ingress. |
 | `sso_mode` | _(empty)_ | Set to `oidc` to enable Single Sign-On. |
 | `oidc_issuer` | _(empty)_ | Your OIDC provider issuer URL. |
 | `oidc_client_id` | _(empty)_ | OIDC client ID. |
@@ -61,16 +67,16 @@ All Jotty data is stored in the add-on's private `/data` directory:
 
 ## Single Sign-On (SSO / OIDC)
 
-Jotty supports any OIDC provider — Authentik, Authelia, Keycloak, Auth0, Google, etc. To enable:
+Jotty supports any OIDC provider — Authentik, Authelia, Keycloak, Auth0, Google, etc. To enable, set these options in the Configuration tab:
 
-```yaml
-sso_mode: oidc
-oidc_issuer: "https://authentik.yourdomain.com/application/o/jotty/"
-oidc_client_id: "your-client-id"
-oidc_client_secret: "your-client-secret"
-app_url: "https://jotty.yourdomain.com"
-sso_fallback_local: true
-```
+| Option | Value |
+|---|---|
+| `sso_mode` | `oidc` |
+| `oidc_issuer` | your provider's issuer URL |
+| `oidc_client_id` | your client ID |
+| `oidc_client_secret` | your client secret |
+| `app_url` | your public Jotty URL |
+| `sso_fallback_local` | `true` to keep local login as a fallback |
 
 See the [upstream SSO docs](https://github.com/fccview/jotty/blob/main/howto/SSO.md) for provider-specific setup guides.
 
@@ -78,15 +84,15 @@ See the [upstream SSO docs](https://github.com/fccview/jotty/blob/main/howto/SSO
 
 ## Ingress
 
-This add-on supports **Home Assistant Ingress**, so it appears as a native panel in your sidebar under the name **Jotty** without needing to open a separate port. The ingress URL is auto-detected and passed to Jotty as `APP_URL` unless you set it manually.
+This add-on supports **Home Assistant Ingress**, appearing as a native **Jotty** panel in your sidebar with no port forwarding required.
 
-If you also want direct external access (e.g. via a reverse proxy), the port **1122** is mapped to internal port 3000 and can be enabled under **Network** in the add-on settings.
+If you also want direct external access (e.g. via a reverse proxy), port **1122** is mapped to Jotty's internal port 3000 and can be enabled under **Network** in the add-on settings.
 
 ---
 
 ## Reverse Proxy
 
-If you expose Jotty externally, set `app_url` to your public URL. Example Nginx config snippet:
+If you expose Jotty externally via a reverse proxy, set `app_url` to your public URL. Example Nginx snippet:
 
 ```nginx
 location / {
@@ -102,26 +108,30 @@ location / {
 
 ## Updating Jotty
 
-When a new version of Jotty is released on GitHub, update this add-on by bumping the `version` in `config.yaml` and rebuilding. Jotty will automatically run any required data migrations on first launch after an update.
+Since this add-on uses `ghcr.io/fccview/jotty:latest`, updating is a two-step process:
+
+1. Click **Restart** in the add-on panel — HA will pull the latest image automatically if it has been updated upstream.
+2. When a new add-on version is released in this repository, you'll see an **Update** button in the Add-on Store.
+
+Jotty runs any required data migrations automatically on first launch after an update.
 
 ---
 
 ## Troubleshooting
 
-**The web UI is blank or shows an error on first load:**
-- Wait 10–15 seconds; Next.js warms up on first start.
-- Check the add-on log for errors.
+**The web UI is blank or slow on first load:**
+Next.js warms up on first start — wait 15–20 seconds and refresh. Check the add-on log if it persists.
 
 **Permission errors in the log:**
-- The add-on runs as user `1000:1000`. HA manages the `/data` directory ownership automatically.
+Adjust `puid` and `pgid` in the configuration to match your system's user ID (find it with `id -u` on Linux).
 
 **Forgot admin password / need to change super admin:**
-- Use the upstream script: see [SSO.md](https://github.com/fccview/jotty/blob/main/howto/SSO.md#changing-super-admin) for the `update-super-admin.sh` instructions.
+See the [upstream docs](https://github.com/fccview/jotty/blob/main/howto/SSO.md) for the `update-super-admin.sh` script.
 
 ---
 
 ## Links
 
 - **Jotty upstream repo:** https://github.com/fccview/jotty
-- **Jotty docs:** https://jotty.page
+- **Jotty docs & demo:** https://jotty.page
 - **Jotty Discord:** https://discord.gg/invite/mMuk2WzVZu
