@@ -14,7 +14,7 @@ startup: application
 boot: auto
 
 ports:
-  1122/tcp: 1122
+  1122/tcp: 3000
 ports_description:
   1122/tcp: "Jotty Web UI"
 
