@@ -1,15 +1,10 @@
 name: "Jotty"
 description: "Lightweight self-hosted app for managing your personal checklists and notes. File-based storage, no database required."
-version: "1.24.0"
+version: "1.23.0"
 slug: "jotty"
 homeassistant_api: false
 auth_api: false
 url: "https://jotty.page/"
-
-# Pull the official multi-arch image directly — no custom Dockerfile needed.
-# The {arch} substitution is NOT used here; the official image is a multi-arch
-# manifest that selects the right variant automatically.
-image: "ghcr.io/fccview/jotty"
 
 arch:
   - amd64
@@ -28,53 +23,30 @@ ingress_port: 3000
 panel_icon: "mdi:note-text-outline"
 panel_title: "Jotty"
 
-# /data is the add-on's private persistent directory included in HA backups.
-# We map it to the paths Jotty expects inside the container.
 map:
   - type: data
     path: /data
 
-# Environment variables passed directly to the Jotty container.
-# All options map 1-to-1 with Jotty's documented env vars.
 options:
-  puid: 1000
-  pgid: 1000
   node_env: "production"
   stop_check_updates: false
   serve_public_images: true
   serve_public_files: true
   app_url: ""
-  sso_mode: ""
+  auth_mode: ""
   oidc_issuer: ""
   oidc_client_id: ""
   oidc_client_secret: ""
   sso_fallback_local: true
 
 schema:
-  puid: "int"
-  pgid: "int"
   node_env: "str"
   stop_check_updates: "bool"
   serve_public_images: "bool"
   serve_public_files: "bool"
   app_url: "str?"
-  sso_mode: "str?"
+  auth_mode: "str?"
   oidc_issuer: "str?"
   oidc_client_id: "str?"
   oidc_client_secret: "str?"
   sso_fallback_local: "bool"
-
-# Map HA options directly to Jotty's environment variables.
-environment:
-  NODE_ENV: node_env
-  PUID: puid
-  PGID: pgid
-  STOP_CHECK_UPDATES: stop_check_updates
-  SERVE_PUBLIC_IMAGES: serve_public_images
-  SERVE_PUBLIC_FILES: serve_public_files
-  APP_URL: app_url
-  AUTH_MODE: sso_mode
-  OIDC_ISSUER: oidc_issuer
-  OIDC_CLIENT_ID: oidc_client_id
-  OIDC_CLIENT_SECRET: oidc_client_secret
-  SSO_FALLBACK_LOCAL: sso_fallback_local

@@ -1,10 +1,3 @@
-# The official ghcr.io/fccview/jotty:latest image is a multi-arch manifest
-# that supports both linux/amd64 and linux/arm64 natively.
-# No per-arch base image override needed.
-
-labels:
-  org.opencontainers.image.title: "Jotty"
-  org.opencontainers.image.description: >
-    Lightweight self-hosted app for managing personal checklists and notes.
-  org.opencontainers.image.source: "https://github.com/fccview/jotty"
-  org.opencontainers.image.licenses: "AGPL-3.0"
+build_from:
+  amd64: ghcr.io/fccview/jotty:latest
+  aarch64: ghcr.io/fccview/jotty:latest

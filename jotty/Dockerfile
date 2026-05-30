@@ -1,22 +1,10 @@
-# ============================================================
-# Jotty - Home Assistant Add-on
-# Uses the official multi-arch Jotty image directly.
-# HA supervisor injects bashio and s6-overlay at build time
-# via the build_from base, but since Jotty's image already
-# has everything it needs, we just wrap it with our run.sh.
-# ============================================================
-FROM ghcr.io/fccview/jotty:latest
+ARG BUILD_FROM=ghcr.io/fccview/jotty:latest
+FROM ${BUILD_FROM}
 
-# Install bashio for reading HA add-on options in run.sh
-RUN apk add --no-cache bash curl \
- && curl -fsSL https://raw.githubusercontent.com/hassio-addons/bashio/master/lib/bashio.sh \
-      -o /usr/lib/bashio.sh \
- && chmod +x /usr/lib/bashio.sh
+RUN apk add --no-cache jq
 
-# Copy our HA entrypoint
-COPY run.sh /run.sh
-RUN chmod +x /run.sh
+COPY jotty-start.sh /jotty-start.sh
+RUN chmod +x /jotty-start.sh
 
-EXPOSE 3000
-
-CMD ["/run.sh"]
+ENTRYPOINT ["/jotty-start.sh"]
+CMD ["node", "server.js"]
