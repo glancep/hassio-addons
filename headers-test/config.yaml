@@ -1,0 +1,19 @@
+name: "Headers Test (temporary)"
+version: "1.0.0"
+slug: "headers-test"
+description: "Temporary debug tool — echoes back every header it receives. Uninstall when done."
+
+arch:
+  - amd64
+  - aarch64
+  - armv7
+  - armhf
+  - i386
+
+startup: application
+boot: manual
+
+ports:
+  80/tcp: 8888
+ports_description:
+  80/tcp: "Header echo web UI"
