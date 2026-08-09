@@ -1,4 +1,4 @@
-# TREK Travel Planner
+# Trek Travel Planner
 
 Self-hosted, real-time collaborative travel planner — trip planning, interactive
 maps, budgets/expense splitting, packing lists, and a PWA client. This add-on
