@@ -1,5 +1,5 @@
 name: "TREK Travel Planner"
-version: "0.0.4"
+version: "0.0.5"
 slug: "trek"
 description: "Trek: A self-hosted, real-time collaborative travel planner with maps, budgets, packing lists, a journal, and AI built in."
 url: "https://github.com/glancep/hassio-addons/trek"
@@ -42,6 +42,7 @@ options:
   oidc_issuer: ""
   oidc_client_id: ""
   oidc_client_secret: ""
+  env_vars: []
 
 schema:
   encryption_key: str?
@@ -55,3 +56,6 @@ schema:
   oidc_issuer: str?
   oidc_client_id: str?
   oidc_client_secret: password?
+  env_vars:
+    - name: match(^[A-Za-z0-9_]+$)
+      value: str?
