@@ -1,5 +1,5 @@
 name: "TREK Travel Planner"
-version: "0.0.2"
+version: "0.0.3"
 slug: "trek"
 description: "Trek: A self-hosted, real-time collaborative travel planner with maps, budgets, packing lists, a journal, and AI built in."
 url: "https://github.com/glancep/hassio-addons/trek"
