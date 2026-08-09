@@ -22,14 +22,14 @@ set_env_if_present() {
 # Trek actually reads/writes (data + uploads) into place.
 echo "Setting up persistent storage..."
 mkdir -p /data/trek-data /data/trek-uploads
-rm -rf /app/data /app/uploads
-ln -s /data/trek-data /app/data
-ln -s /data/trek-uploads /app/uploads
-mkdir -p /app/data/logs \
-         /app/uploads/files \
-         /app/uploads/covers \
-         /app/uploads/avatars \
-         /app/uploads/photos
+rm -rf /app/server/data /app/server/uploads
+ln -s /data/trek-data /app/server/data
+ln -s /data/trek-uploads /app/server/uploads
+mkdir -p /app/server/data/logs \
+         /app/server/uploads/files \
+         /app/server/uploads/covers \
+         /app/server/uploads/avatars \
+         /app/server/uploads/photos
 
 # --- Translate HA add-on options into Trek's env vars -------------------
 echo "Restoring configuration from add-on options..."
