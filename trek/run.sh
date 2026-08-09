@@ -55,6 +55,21 @@ fi
 export PORT=3000
 export NODE_ENV=production
 
+# --- Arbitrary user-defined env vars -------------------------------------
+# env_vars is a list of {name, value} objects in options.json. Applied
+# last, so it can override anything above (including PORT/NODE_ENV) if
+# the user deliberately sets one of those names — that's on them.
+env_count=$(jq -r '.env_vars | length' "$OPTIONS")
+i=0
+while [ "$i" -lt "$env_count" ]; do
+    var_name=$(jq -r --argjson i "$i" '.env_vars[$i].name' "$OPTIONS")
+    var_value=$(jq -r --argjson i "$i" '.env_vars[$i].value // empty' "$OPTIONS")
+    if [ -n "$var_name" ]; then
+        export "$var_name=$var_value"
+    fi
+    i=$((i + 1))
+done
+
 echo "Starting Trek..."
 
 # --- Hand off to Trek's own startup logic --------------------------------
@@ -64,14 +79,6 @@ if [ ! -f /app/server/dist/index.js ]; then
   echo "FATAL: TREK application files missing from image (unexpected — base image issue)."
   exit 1
 fi
-
-# --- Temporary diagnostics — remove once this is confirmed working ------
-echo "DEBUG whoami: $(whoami)"
-echo "DEBUG /app/data -> $(readlink -f /app/data)"
-echo "DEBUG /app/server/data -> $(readlink -f /app/server/data)"
-echo "DEBUG ls -la /data/trek-data:"
-ls -la /data/trek-data
-# --------------------------------------------------------------------------
 
 chown -R node:node /data/trek-data /data/trek-uploads
 
