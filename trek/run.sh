@@ -66,6 +66,7 @@ while [ "$i" -lt "$env_count" ]; do
     var_value=$(jq -r --argjson i "$i" '.env_vars[$i].value // empty' "$OPTIONS")
     if [ -n "$var_name" ]; then
         export "$var_name=$var_value"
+        echo "Set env var [$var_name]=[$var_value] from options.json"
     fi
     i=$((i + 1))
 done
