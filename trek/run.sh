@@ -22,14 +22,11 @@ set_env_if_present() {
 # Trek actually reads/writes (data + uploads) into place.
 echo "Setting up persistent storage..."
 mkdir -p /data/trek-data /data/trek-uploads
-rm -rf /app/server/data /app/server/uploads
-ln -s /data/trek-data /app/server/data
-ln -s /data/trek-uploads /app/server/uploads
-mkdir -p /app/server/data/logs \
-         /app/server/uploads/files \
-         /app/server/uploads/covers \
-         /app/server/uploads/avatars \
-         /app/server/uploads/photos
+rm -rf /app/data /app/uploads
+ln -s /data/trek-data /app/data
+ln -s /data/trek-uploads /app/uploads
+mkdir -p /app/data/logs /app/uploads/files /app/uploads/covers \
+         /app/uploads/avatars /app/uploads/photos
 
 # --- Translate HA add-on options into Trek's env vars -------------------
 echo "Restoring configuration from add-on options..."
@@ -60,7 +57,20 @@ if [ ! -f /app/server/dist/index.js ]; then
   exit 1
 fi
 
-chown -R node:node /app/data /app/uploads 2>/dev/null || true
+# --- Temporary diagnostics — remove once this is confirmed working ------
+echo "DEBUG whoami: $(whoami)"
+echo "DEBUG id: $(id)"
+echo "DEBUG /app/data -> $(readlink -f /app/data)"
+echo "DEBUG ls -la /app/data:"
+ls -la /app/data
+echo "DEBUG ls -la $(readlink -f /app/data):"
+ls -la "$(readlink -f /app/data)"
+# --------------------------------------------------------------------------
+
+# NOTE: chown errors are no longer swallowed — if this line fails, the
+# script will now exit loudly instead of hiding it, which is what we want
+# while debugging.
+chown -R node:node /app/data /app/uploads
 
 cd /app/server
 exec gosu node node --require tsconfig-paths/register dist/index.js
