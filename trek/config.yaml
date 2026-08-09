@@ -1,0 +1,57 @@
+name: "TREK Travel Planner"
+version: "0.0.1"
+slug: "trek"
+description: "Trek: A self-hosted, real-time collaborative travel planner — with maps, budgets, packing lists, a journal, and AI built in."
+url: "https://github.com/glancep/hassio-addons/trek"
+
+arch:
+  - amd64
+  - aarch64
+
+# The base image already ships its own ENTRYPOINT (dumb-init) and handles
+# privilege drop itself (root -> node via gosu). Disable HA's own init
+# wrapper so we don't double up on PID 1 handling.
+init: false
+
+startup: application
+boot: auto
+
+ports:
+  3000/tcp: 3000
+ports_description:
+  3000/tcp: "Trek web UI"
+
+# Mounts HA's persistent add-on storage at /data inside the container.
+# Trek's own image forbids mounting anything directly at /app (it hides
+# the baked-in app code), so run.sh symlinks /data into the paths Trek
+# expects (/app/data, /app/uploads) instead of mounting there directly.
+map:
+  - data:rw
+
+watchdog: "http://[HOST]:[PORT:3000]/api/health"
+
+options:
+  encryption_key: ""
+  timezone: "UTC"
+  log_level: "info"
+  admin_email: ""
+  admin_password: ""
+  app_url: ""
+  allowed_origins: ""
+  oidc_enabled: false
+  oidc_issuer: ""
+  oidc_client_id: ""
+  oidc_client_secret: ""
+
+schema:
+  encryption_key: str?
+  timezone: str
+  log_level: list(info|debug)
+  admin_email: str?
+  admin_password: password?
+  app_url: str?
+  allowed_origins: str?
+  oidc_enabled: bool
+  oidc_issuer: str?
+  oidc_client_id: str?
+  oidc_client_secret: password?
