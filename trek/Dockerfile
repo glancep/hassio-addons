@@ -1,7 +1,7 @@
 # Pin to a specific Trek release rather than :latest, so add-on updates are
 # deliberate (bump TREK_VERSION + config.yaml version together, not silent).
 # Check https://github.com/liketrek/TREK/releases for the current tag.
-ARG TREK_VERSION=3.3.0
+ARG TREK_VERSION=3.4.1
 FROM mauriceboe/trek:${TREK_VERSION}
 
 USER root
