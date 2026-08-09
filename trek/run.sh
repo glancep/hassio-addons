@@ -18,15 +18,23 @@ set_env_if_present() {
 # --- Persistent storage ------------------------------------------------
 # Trek's image refuses to start if a volume is mounted directly at /app
 # (it hides the baked-in node_modules/dist). HA's persistent add-on
-# storage is mounted at /data instead, so we symlink the two subpaths
-# Trek actually reads/writes (data + uploads) into place.
+# storage is mounted at /data instead, so we symlink into place.
+#
+# NOTE: because this script cd's into /app/server before exec'ing node
+# (required so tsconfig-paths/register can find its config), Trek's own
+# "data"/"uploads" relative paths resolve against THAT cwd — i.e. actual
+# runtime writes land on /app/server/data, not /app/data as upstream's
+# standalone deployment docs describe. We link both locations to the same
+# backing store so it works regardless of which path Trek resolves.
 echo "Setting up persistent storage..."
 mkdir -p /data/trek-data /data/trek-uploads
-rm -rf /app/data /app/uploads
+rm -rf /app/data /app/uploads /app/server/data /app/server/uploads
 ln -s /data/trek-data /app/data
 ln -s /data/trek-uploads /app/uploads
-mkdir -p /app/data/logs /app/uploads/files /app/uploads/covers \
-         /app/uploads/avatars /app/uploads/photos
+ln -s /data/trek-data /app/server/data
+ln -s /data/trek-uploads /app/server/uploads
+mkdir -p /data/trek-data/logs /data/trek-uploads/files /data/trek-uploads/covers \
+         /data/trek-uploads/avatars /data/trek-uploads/photos
 
 # --- Translate HA add-on options into Trek's env vars -------------------
 echo "Restoring configuration from add-on options..."
@@ -59,18 +67,13 @@ fi
 
 # --- Temporary diagnostics — remove once this is confirmed working ------
 echo "DEBUG whoami: $(whoami)"
-echo "DEBUG id: $(id)"
 echo "DEBUG /app/data -> $(readlink -f /app/data)"
-echo "DEBUG ls -la /app/data:"
-ls -la /app/data
-echo "DEBUG ls -la $(readlink -f /app/data):"
-ls -la "$(readlink -f /app/data)"
+echo "DEBUG /app/server/data -> $(readlink -f /app/server/data)"
+echo "DEBUG ls -la /data/trek-data:"
+ls -la /data/trek-data
 # --------------------------------------------------------------------------
 
-# NOTE: chown errors are no longer swallowed — if this line fails, the
-# script will now exit loudly instead of hiding it, which is what we want
-# while debugging.
-chown -R node:node /app/data /app/uploads
+chown -R node:node /data/trek-data /data/trek-uploads
 
 cd /app/server
 exec gosu node node --require tsconfig-paths/register dist/index.js
