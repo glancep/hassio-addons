@@ -1,0 +1,22 @@
+name: "Caddy (internal proxy)"
+version: "1.0.0"
+slug: "caddy"
+description: "Internal-only Caddy instance that sits behind NPM to set headers NPM can't override (e.g. X-Forwarded-Proto for apps behind Cloudflare Tunnel)"
+
+arch:
+  - amd64
+  - aarch64
+  - armv7
+  - armhf
+  - i386
+
+init: false
+startup: application
+boot: auto
+
+# Deliberately no `ports:` mapping — this add-on is only reachable by other
+# add-ons on HA's internal Docker network (e.g. NPM), never exposed
+# directly. NPM continues to be the only externally-facing hop.
+
+map:
+  - addon_config:rw
