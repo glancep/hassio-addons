@@ -36,6 +36,11 @@ Bump `TREK_VERSION` in the add-on's `Dockerfile` and `version` in
 `config.yaml` together when a new [Trek release](https://github.com/liketrek/TREK/releases)
 comes out, then rebuild. Your data is untouched by updates.
 
+Before upgrading to Trek 5.2.0, create a Home Assistant backup: Trek migrates
+the database on first startup. Keep the existing `encryption_key` unchanged;
+Trek 5.0.0 and later stops startup if the configured key differs from the one
+used to encrypt stored data.
+
 ## Known limitations
 
 - Multi-arch support is limited to `amd64` and `aarch64` — Trek's server

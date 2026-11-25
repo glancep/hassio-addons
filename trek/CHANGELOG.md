@@ -1,5 +1,28 @@
 # Changelog
 
+## v5.2.0 - database and trip updates
+
+Updated the bundled Trek image from 3.4.1 to 5.2.0.
+
+### Upgrade notes
+
+- Back up the add-on before updating. Trek 5.2.0 migrates the database on its
+  first start.
+- Keep the existing `encryption_key` unchanged. Since Trek 5.0.0, startup
+  stops if `ENCRYPTION_KEY` differs from the key used to encrypt stored data;
+  restore the old key or rotate it using Trek's rotation script.
+- Trek 5.1.0 uses Trek-hosted map services by default. To opt out, set
+  `TREK_SERVICES=off` in `env_vars`; `TREK_PLACES_ENABLED=false` also disables
+  searches against Trek's place index.
+- API clients should migrate from login-response tokens to session cookies;
+  Trek still returns the token, but marks it deprecated.
+
+### Highlights
+
+- PostgreSQL support, booking-email import, live flight status, and per-trip
+  add-on controls.
+- Full release notes: [Trek v5.2.0](https://github.com/liketrek/TREK/releases/tag/v5.2.0).
+
 ## v3.4.1 - bug fixes
 
 ### Fixes:
